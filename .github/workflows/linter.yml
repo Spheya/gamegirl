@@ -12,7 +12,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    
     - uses: cpp-linter/cpp-linter-action@v2
       id: linter
       env:
@@ -22,6 +21,5 @@ jobs:
         tidy-checks: ''
         version: '19'
         thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
-
     - if: steps.linter.outputs.checks-failed > 0
       run: exit 1
