@@ -1,6 +1,12 @@
-﻿cmake_minimum_required (VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.20)
 
-project ("gamegirl")
+option(GAMEGIRL_BUILD_TESTS "Build unit tests" OFF)
 
-add_executable (gamegirl "gamegirl.cpp")
-set_property(TARGET gamegirl PROPERTY CXX_STANDARD 23)
+project(gamegirl)
+
+add_subdirectory(emulator)
+add_subdirectory(app)
+
+if(GAMEGIRL_BUILD_TESTS)
+    add_subdirectory(tests)
+endif()

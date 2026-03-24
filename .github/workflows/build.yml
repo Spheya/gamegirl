@@ -8,21 +8,29 @@ on:
 jobs:
   build:
     name: Build Project
-    runs-on: ${{matrix.os}}
+    runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        build-type: [Debug, Release]
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        preset: [debug, release]
 
     steps:
     - uses: actions/checkout@v4
+
     - uses: lukka/get-cmake@latest
+
     - uses: KyleMayes/install-llvm-action@v2
       with:
         version: "21"
-    - run: |
-        mkdir build
-        cd build
-        cmake -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=${{matrix.build-type}} ..
+
+    - name: Build
+      run: |
+        cmake \
+          --preset ${{ matrix.preset }} \
+          -DCMAKE_C_COMPILER=clang \
+          -DCMAKE_CXX_COMPILER=clang++ \
+          -DGAMEGIRL_BUILD_TESTS=On
         cmake --build .
+
+    - name: Run Tests
+      run: ctest --test-dir build/${{ matrix.preset }}/tests

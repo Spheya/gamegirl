@@ -1,5 +1,8 @@
-/out/
 /build/
 CMakeUserPresets.json
 
 .vs/
+.vscode/
+.cache/
+
+.clangd
