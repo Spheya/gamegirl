@@ -27,7 +27,6 @@ jobs:
           -DCMAKE_CXX_COMPILER=clang++ \
           -DGAMEGIRL_BUILD_TESTS=On
         cmake --build .
-    - name: 
 
     - name: Run Tests
       run: ctest --test-dir build/${{ matrix.preset }}/tests
