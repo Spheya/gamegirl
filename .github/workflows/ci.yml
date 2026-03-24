@@ -1,4 +1,4 @@
-name: Build
+name: CI
 
 on:
   push:
@@ -9,6 +9,8 @@ jobs:
   build:
     name: Build Project
     runs-on: ubuntu-latest
+    container:
+      image: silkeh/clang:latest
 
     strategy:
       matrix:
@@ -16,12 +18,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
-    - uses: lukka/get-cmake@latest
-
-    - uses: KyleMayes/install-llvm-action@v2
-      with:
-        version: "21"
 
     - name: Build
       run: |
@@ -31,6 +27,7 @@ jobs:
           -DCMAKE_CXX_COMPILER=clang++ \
           -DGAMEGIRL_BUILD_TESTS=On
         cmake --build .
+    - name: 
 
     - name: Run Tests
       run: ctest --test-dir build/${{ matrix.preset }}/tests
