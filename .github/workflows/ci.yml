@@ -21,12 +21,14 @@ jobs:
 
     - name: Build
       run: |
+        mkdir build
         cmake \
           --preset ${{ matrix.preset }} \
           -DCMAKE_C_COMPILER=clang \
           -DCMAKE_CXX_COMPILER=clang++ \
           -DGAMEGIRL_BUILD_TESTS=On
-        cmake --build .
+          -B build
+        cmake --build build
 
     - name: Run Tests
       run: ctest --test-dir build/${{ matrix.preset }}/tests
