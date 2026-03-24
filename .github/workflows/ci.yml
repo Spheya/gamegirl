@@ -10,7 +10,7 @@ jobs:
     name: Build Project
     runs-on: ubuntu-latest
     container:
-      image: silkeh/clang:latest
+      image: spheya/clang-cmake-ninja:latest
 
     strategy:
       matrix:
