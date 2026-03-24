@@ -26,9 +26,9 @@ jobs:
           --preset ${{ matrix.preset }} \
           -DCMAKE_C_COMPILER=clang \
           -DCMAKE_CXX_COMPILER=clang++ \
-          -DGAMEGIRL_BUILD_TESTS=On
+          -DGAMEGIRL_BUILD_TESTS=On \
           -B build
-        cmake --build build
+        cmake --build --preset ${{ matrix.preset }}.
 
     - name: Run Tests
-      run: ctest --test-dir build/${{ matrix.preset }}/tests
+      run: ctest --test-dir build/tests
