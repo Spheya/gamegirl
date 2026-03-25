@@ -22,7 +22,7 @@ jobs:
       run: |
         mkdir build
         cmake \
-          --preset ${{ matrix.preset,, }} \
+          --preset ${{ matrix.preset.toLowerCase() }} \
           -DCMAKE_C_COMPILER=clang \
           -DCMAKE_CXX_COMPILER=clang++ \
           -DGAMEGIRL_BUILD_TESTS=On \
@@ -30,7 +30,7 @@ jobs:
         cmake --build build
     - uses: actions/upload-artifact@v3
       with:
-        name: build-linux-${{ matrix.preset,, }}
+        name: build-linux-${{ matrix.preset.toLowerCase() }}
         path: build/
         retention-days: 1
 
@@ -49,7 +49,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v3
         with:
-          name: build-linux-${{ matrix.preset,, }}
+          name: build-linux-${{ matrix.preset.toLowerCase() }}
           path: build/
       - name: Run Tests
         run: ctest --test-dir build/tests
@@ -69,7 +69,7 @@ jobs:
     - uses: actions/checkout@v4
     - uses: actions/download-artifact@v3
       with:
-        name: build-linux-${{ matrix.preset,, }}
+        name: build-linux-${{ matrix.preset.toLowerCase() }}
         path: build/
     - uses: cpp-linter/cpp-linter-action@v2
       id: linter
@@ -82,5 +82,3 @@ jobs:
         thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
     - if: steps.linter.outputs.checks-failed > 0
       run: exit 1
-
-    
