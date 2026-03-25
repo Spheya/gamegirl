@@ -34,7 +34,7 @@ namespace gg {
 
 		void copy(void* dst, MemoryRange range) const;
 		void copy(void* dst, ptr src, size size) const;
-		void copy(ptr dst, void* src, size size);
+		void copy(ptr dst, const void* src, size size);
 
 	private:
 		void destroy();
@@ -45,23 +45,23 @@ namespace gg {
 
 	inline uint8_t Memory::read(ptr address) const {
 		if(EchoRam.contains(address)) {
-			Logger::warn("Reading from echo RAM ({:#04x})", address);
+			Logger::warn("Reading from echo RAM ({:#06x})", address);
 			address -= EchoRam.begin - WorkRam.begin;
 		} else if(UnusedMemory.contains(address)) {
-			Logger::warn("Reading from prohibited memory ({:#04x})", address);
+			Logger::warn("Reading from prohibited memory ({:#06x})", address);
 		}
 		return m_memory[address];
 	}
 
 	inline void Memory::write(ptr address, uint8_t value) {
 		if(EchoRam.contains(address)) {
-			Logger::warn("Writing to echo RAM ({:#04x})", address);
+			Logger::warn("Writing to echo RAM ({:#06x})", address);
 			address -= EchoRam.begin - WorkRam.begin;
 		} else if(UnusedMemory.contains(address)) {
-			Logger::warn("Writing to prohibited memory ({:#04x})", address);
+			Logger::warn("Writing to prohibited memory ({:#06x})", address);
 			return;
 		} else if(Rom.contains(address)) {
-			Logger::warn("Writing to read-only memory ({:#04x})", address);
+			Logger::warn("Writing to read-only memory ({:#06x})", address);
 		}
 		m_memory[address] = value;
 	}
@@ -76,7 +76,7 @@ namespace gg {
 		memcpy(dst, m_memory + src, size);
 	}
 
-	inline void Memory::copy(ptr dst, void* src, size size) {
+	inline void Memory::copy(ptr dst, const void* src, size size) {
 		assert(!EchoRam.overlaps(MemoryRange{ .begin = dst, .end = uint16_t(dst + size) }));
 		assert(!UnusedMemory.overlaps(MemoryRange{ .begin = dst, .end = uint16_t(dst + size) }));
 		memcpy(m_memory + dst, src, size);
