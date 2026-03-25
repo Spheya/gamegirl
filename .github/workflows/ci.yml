@@ -6,7 +6,8 @@ on:
   pull_request:
 
 permissions:
-  contents: read
+  contents: read 
+  pull-requests: read 
 
 jobs:
   build:
@@ -86,6 +87,6 @@ jobs:
         tidy-checks: ''
         version: '19'
         database: 'build'
-        step-summaryL true
+        step-summary: true
     - if: steps.linter.outputs.checks-failed > 0
       run: exit 1
