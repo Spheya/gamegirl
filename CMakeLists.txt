@@ -13,7 +13,7 @@ add_subdirectory(emulator)
 add_subdirectory(app)
 
 if(GAMEGIRL_BUILD_TESTS)
-    add_subdirectory(tests)
+  add_subdirectory(tests)
 endif()
 
 if(POLICY CMP0135)
