@@ -25,8 +25,8 @@ jobs:
           --preset ${{ matrix.preset }} \
           -DCMAKE_C_COMPILER=clang \
           -DCMAKE_CXX_COMPILER=clang++ \
-          -DGAMEGIRL_BUILD_TESTS=On \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+          -DGAMEGIRL_BUILD_TESTS=On \
           -B build
         cmake --build build
     - uses: actions/upload-artifact@v7
