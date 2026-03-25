@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read 
+  pull-requests: read 
+
+jobs:
+  build:
+    name: Build Project
+    runs-on: ubuntu-latest
+    container:
+      image: spheya/clang-cmake-ninja:latest
+
+    strategy:
+      matrix:
+        preset: [debug, release]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build
+      run: |
+        mkdir build
+        cmake \
+          --preset ${{ matrix.preset }} \
+          -DCMAKE_C_COMPILER=clang \
+          -DCMAKE_CXX_COMPILER=clang++ \
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+          -DCMAKE_CXX_FLAGS="-Werror" \
+          -DGAMEGIRL_BUILD_TESTS=On \
+          -B build
+        cmake --build build --parallel $(nproc)
+    - uses: actions/upload-artifact@v7
+      with:
+        name: build-linux-${{ matrix.preset }}
+        path: build/
+        retention-days: 1
+
+  tests:
+    name: Run Tests
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: spheya/clang-cmake-ninja:latest
+
+    strategy:
+      matrix:
+        preset: [debug, release]
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v8
+        with:
+          name: build-linux-${{ matrix.preset }}
+          path: build/
+      - name: Run Tests
+        run: |
+          chmod +x build/tests/*
+          ctest --test-dir build/tests
+
+  linting:
+    name: Linter
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: spheya/clang-cmake-ninja:latest
+
+    strategy:
+      matrix:
+        preset: [debug, release]
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v8
+      with:
+        name: build-linux-${{ matrix.preset }}
+        path: build/
+    - uses: cpp-linter/cpp-linter-action@v2
+      id: linter
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        style: 'file'
+        tidy-checks: ''
+        version: '19'
+        database: 'build'
+        step-summary: true
+    - if: steps.linter.outputs.checks-failed > 0
+      run: exit 1

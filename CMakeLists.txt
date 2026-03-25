@@ -1,6 +1,21 @@
-﻿cmake_minimum_required (VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.20)
 
-project ("gamegirl")
+if(POLICY CMP0135)
+  cmake_policy(PUSH)
+  cmake_policy(SET CMP0135 NEW)
+endif()
 
-add_executable (gamegirl "gamegirl.cpp")
-set_property(TARGET gamegirl PROPERTY CXX_STANDARD 23)
+option(GAMEGIRL_BUILD_TESTS "Build unit tests" OFF)
+
+project(gamegirl)
+
+add_subdirectory(emulator)
+add_subdirectory(app)
+
+if(GAMEGIRL_BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
+
+if(POLICY CMP0135)
+  cmake_policy(POP)
+endif()

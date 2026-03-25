@@ -1,0 +1,16 @@
+include(FetchContent)
+
+enable_testing()
+
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/heads/main.zip
+)
+FetchContent_MakeAvailable(googletest)
+
+add_executable(gg_test_memory memory.cpp)
+target_link_libraries(gg_test_memory PRIVATE ggemu gtest_main)
+set_property(TARGET gg_test_memory PROPERTY CXX_STANDARD 23)
+
+include(GoogleTest)
+gtest_discover_tests(gg_test_memory)
