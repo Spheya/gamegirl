@@ -14,21 +14,73 @@ jobs:
 
     strategy:
       matrix:
-        preset: [debug, release]
+        preset: [Debug, Release]
 
     steps:
     - uses: actions/checkout@v4
-
     - name: Build
       run: |
         mkdir build
         cmake \
-          --preset ${{ matrix.preset }} \
+          --preset ${{ matrix.preset,, }} \
           -DCMAKE_C_COMPILER=clang \
           -DCMAKE_CXX_COMPILER=clang++ \
           -DGAMEGIRL_BUILD_TESTS=On \
           -B build
         cmake --build build
+    - uses: actions/upload-artifact@v3
+      with:
+        name: build-linux-${{ matrix.preset,, }}
+        path: build/
+        retention-days: 1
 
-    - name: Run Tests
-      run: ctest --test-dir build/tests
+  tests:
+    name: Run Tests
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: spheya/clang-cmake-ninja:latest
+
+    strategy:
+      matrix:
+        preset: [Debug, Release]
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-linux-${{ matrix.preset,, }}
+          path: build/
+      - name: Run Tests
+        run: ctest --test-dir build/tests
+
+  linting:
+    name: Linter
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: spheya/clang-cmake-ninja:latest
+
+    strategy:
+      matrix:
+        preset: [Debug, Release]
+
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/download-artifact@v3
+      with:
+        name: build-linux-${{ matrix.preset,, }}
+        path: build/
+    - uses: cpp-linter/cpp-linter-action@v2
+      id: linter
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        style: 'file'
+        tidy-checks: ''
+        version: '19'
+        thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
+    - if: steps.linter.outputs.checks-failed > 0
+      run: exit 1
+
+    
