@@ -18,8 +18,4 @@ int main() {
 	gg::Logger::info("hi!");
 	gg::Logger::warn("hi!");
 	gg::Logger::error("hi!");
-
-	int* p = new int(5);
-
-	std::cout << *p << std::endl;
 }
