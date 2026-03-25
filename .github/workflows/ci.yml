@@ -81,6 +81,7 @@ jobs:
         style: 'file'
         tidy-checks: ''
         version: '19'
+        database: 'build'
         thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
     - if: steps.linter.outputs.checks-failed > 0
       run: exit 1
