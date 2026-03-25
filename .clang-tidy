@@ -15,6 +15,7 @@ Checks: >
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-init-variables,
   -cppcoreguidelines-no-malloc,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
   -cppcoreguidelines-owning-memory,
   -cppcoreguidelines-pro-bounds-*,
   -cppcoreguidelines-pro-type-reinterpret-cast,
