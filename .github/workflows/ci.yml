@@ -26,6 +26,7 @@ jobs:
           -DCMAKE_C_COMPILER=clang \
           -DCMAKE_CXX_COMPILER=clang++ \
           -DGAMEGIRL_BUILD_TESTS=On \
+          -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
           -B build
         cmake --build build
     - uses: actions/upload-artifact@v7
