@@ -7,7 +7,7 @@ namespace gg {
 	using size = uint16_t;
 	using ptr = uint16_t;
 
-	struct MemoryRange { 
+	struct MemoryRange {
 		ptr begin;
 		ptr end;
 		[[nodiscard]] constexpr size size() const { return end - begin; }
