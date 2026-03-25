@@ -6,9 +6,8 @@ on:
   pull_request:
 
 permissions:
-  metadata: read
-  contents: write
-  pull-requests: write
+  contents: read 
+  pull-requests: read 
 
 jobs:
   build:
@@ -88,6 +87,6 @@ jobs:
         tidy-checks: ''
         version: '19'
         database: 'build'
-        thread-comments: ${{ github.event_name == 'pull_request' && 'update' }}
+        step-summaryL true
     - if: steps.linter.outputs.checks-failed > 0
       run: exit 1
