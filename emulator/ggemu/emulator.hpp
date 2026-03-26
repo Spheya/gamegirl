@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "cartridge.hpp"
 #include "memory.hpp"
 #include "register.hpp"
@@ -20,6 +22,8 @@ namespace gg {
 	public:
 		RegisterContext registers;
 		Memory memory;
+
+		std::function<void(Emulator& emulator)> traceCallback;
 
 	private:
 		CartridgeHeader m_cartridgeHeader;

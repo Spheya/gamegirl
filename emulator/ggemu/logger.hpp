@@ -6,7 +6,7 @@
 
 namespace gg {
 
-	enum class LogLevel { Trace, Info, Warn, Error };
+	enum class LogLevel { Log, Info, Warn, Error };
 
 	class Logger {
 	public:
@@ -16,7 +16,7 @@ namespace gg {
 #else
 		template<typename... T>
 		static void log(std::format_string<T...> fmt, T&&... args) {
-			if(messageCallback) messageCallback(std::format(fmt, std::forward<T&&>(args)...), LogLevel::Trace);
+			if(messageCallback) messageCallback(std::format(fmt, std::forward<T&&>(args)...), LogLevel::Log);
 		}
 #endif
 

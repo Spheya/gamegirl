@@ -65,4 +65,8 @@ namespace gg {
 		return false;
 	}
 
+	void Emulator::step() {
+		if(traceCallback) traceCallback(*this);
+	}
+
 } // namespace gg

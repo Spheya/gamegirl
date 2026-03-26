@@ -1,15 +1,22 @@
-#include <filesystem>
+#include <cstring>
 #include <format>
 #include <fstream>
+#include <iostream>
 #include <print>
+#include <string>
 #include <vector>
 
 #include <ggemu/emulator.hpp>
 #include <ggemu/logger.hpp>
 
-struct Options {
-	bool log;
-};
+#include "tracer.hpp"
+
+namespace {
+	struct Options {
+		bool trace;
+		size_t traceNum;
+	};
+} // namespace
 
 static void messageCallback(std::string_view message, gg::LogLevel level) {
 	switch(level) {
@@ -21,17 +28,49 @@ static void messageCallback(std::string_view message, gg::LogLevel level) {
 	std::println("{}", message);
 }
 
+static void printUsage() {
+	std::println("Usage: gamegirl <path-to-rom-file> [options]");
+	std::println("Available Options:");
+	std::println("  --trace [numSteps] : produces a file containing the state of the gameboy at every operation");
+}
+
 int main(int argc, const char* args[]) {
 	if(argc < 2) {
-		std::println("Usage: gamegirl <path-to-rom-file> [options]");
+		printUsage();
 		return -1;
 	}
 
 	const char* filePath = args[1];
 
+	// Load options
+	Options options = {};
+	for(int i = 2; i < argc; ++i) {
+		if(std::strcmp(args[i], "--trace") == 0) {
+			options.trace = true;
+			if(argc > i + 1) {
+				size_t pos;
+				std::string param = args[i];
+				options.traceNum = std::stoi(param, &pos);
+				if(pos == param.size()) {
+					++i;
+				} else {
+					std::println("Invalid option provided: {}", args[i]);
+					printUsage();
+					return -1;
+				}
+			}
+		} else {
+			std::println("Invalid option provided: {}", args[i]);
+			printUsage();
+			return -1;
+		}
+	}
+
+	// Setup emulator
 	gg::Logger::messageCallback = messageCallback;
 	gg::Emulator emulator;
 
+	// Load rom file
 	{
 		// Todo: not hardcode the rom file
 		std::ifstream romFile(filePath, std::ios::binary | std::ios::ate);
@@ -55,10 +94,16 @@ int main(int argc, const char* args[]) {
 		emulator.loadRom(buffer.data(), romSize);
 	}
 
+	// Setup logger
 	gg::Logger::messageCallback = [&emulator](std::string_view message, gg::LogLevel level) {
-		std::print("[${:04x}] ", emulator.registers.PC);
+		std::print("[${:04X}] ", emulator.registers.PC);
 		messageCallback(message, level);
 	};
+
+	// Setup tracer
+	if(options.trace) emulator.traceCallback = Tracer(std::make_shared<std::ostream>(std::cout.rdbuf()), options.traceNum);
+
+	emulator.step();
 
 	gg::Logger::log("hi!");
 	gg::Logger::info("hi!");
