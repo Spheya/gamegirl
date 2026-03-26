@@ -7,6 +7,10 @@
 #include <ggemu/emulator.hpp>
 #include <ggemu/logger.hpp>
 
+struct Options {
+	bool log;
+};
+
 static void messageCallback(std::string_view message, gg::LogLevel level) {
 	switch(level) {
 	case gg::LogLevel::Info: std::print("\033[1;32mInfo > \033[0m"); break;
@@ -17,28 +21,35 @@ static void messageCallback(std::string_view message, gg::LogLevel level) {
 	std::println("{}", message);
 }
 
-int main() {
+int main(int argc, const char* args[]) {
+	if(argc < 2) {
+		std::println("Usage: gamegirl <path-to-rom-file> [options]");
+		return -1;
+	}
+
+	const char* filePath = args[1];
+
 	gg::Logger::messageCallback = messageCallback;
 	gg::Emulator emulator;
 
 	{
 		// Todo: not hardcode the rom file
-		std::ifstream romFile("../../../roms/tetris.gb", std::ios::binary | std::ios::ate);
+		std::ifstream romFile(filePath, std::ios::binary | std::ios::ate);
 		if(!romFile.is_open()) {
 			std::println("Could not read ROM file: could not open file");
-			return -1;
+			return -2;
 		}
 		size_t fileSize = size_t(romFile.tellg());
 		if(fileSize > 0xFFFF) {
 			std::println("Could not read ROM file: file too big");
-			return -2;
+			return -3;
 		}
 		auto romSize = gg::size(fileSize);
 		std::vector<char> buffer(romSize);
 		romFile.seekg(0);
 		if(!romFile.read(buffer.data(), romSize)) {
 			std::println("Could not read ROM file: error reading file");
-			return -3;
+			return -4;
 		}
 
 		emulator.loadRom(buffer.data(), romSize);
